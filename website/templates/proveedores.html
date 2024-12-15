@@ -1,0 +1,117 @@
+{% load static%}    
+{% include "base.html" %}
+<!-- En este archivo HTML se crea la tabla de proveedores, la cual será heredada en la página de proveedores. En ella se encontrarán los proveedores que se encuentran en la base de datos.-->
+{% block content %}
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} m-3">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <div id="proveedores">
+        <link type="text/css" href='{% static "css/proveedor.css" %}' rel="stylesheet"/>
+        <div id="titulo-modelo">
+            <h1>PROVEEDORES</h1>
+        </div>
+        <!-- Formulario para subir el archivo Excel -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <form method="POST" enctype="multipart/form-data" action="{% url 'upload_excel_productos' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Subir archivo Excel:</label>
+                        <input type="file" name="file" class="form-control" accept=".xlsx, .xls" required>
+                    </div>
+                    <div class="d-flex " style="gap: 5px;">
+                        <button type="submit" class="btn btn-primary">Subir archivo</button>
+                        <a href="{% static 'xlsx/proveedores.xlsx' %}" class="btn btn-outline-success">Descargar Formato de Excel</a>
+                    </div>
+                </form>
+            </div>          
+        </div>
+        <!-- Botón para eliminar. -->
+        <div class="col d-grid gap-2 d-md-flex">
+            <button id="eliminar-seleccion" type="button" class="btn btn-danger">Eliminar Selección</button>
+        </div>
+        <!-- Contenedor principal con opciones de edición y añadir proveedor. -->
+        <div class="a">
+            <div class="row align-items-end">
+                <div class="col">
+                    <div id="ediciones">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Editar</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addnewproveedor">
+                        Añade un proveedor
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal -->
+        <div class="modal fade" id="addnewproveedor" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Añadir Proveedor</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        <!-- Formulario para añadir un proveedor. --> 
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label>Nombre del proveedor</label>
+                            <input type="text" id="nombre_prov" class="form-control"/>
+                        </div>
+                        <div class="mb-3">
+                            <label>Email de empresa</label>
+                            <input type="email" id="email_empresa" class="form-control"/>
+                        </div>
+                        <div class="mb-3">
+                            <label>Telefono de la empresa</label>
+                            <input type="number" id="telefono_empresa" class="form-control"/>
+                        </div>                       
+                    </form>
+                </div>
+                <!-- Botones para guardar o cancelar. -->
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" class="btn btn-primary" id="submit">Guardar cambios</button>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!-- Inicio de la tabla. --> 
+        <table id="table" summary="tabla Proveedor" class="table table-bordered table-hover dt-responsive">
+            <thead>    
+            <tr class="listado">   
+                <!-- Encabezados. --> 
+                <th> NOMBRE PROVEEDOR </th>     
+                <th> EMAIL</th>
+                <th> TELÉFONO </th>
+                <th> SEL </th>
+            </tr>
+            </thead>
+            <tbody>        
+                {% for proveedor in proveedores %}
+                <tr class="listado">
+                    <!-- Ciclo para llenar la tabla con los datos de la base de datos. -->  
+                    <td >{{ proveedor.nombre_prov }}</td>
+                    <td class="editable" data-nombre_prov="{{ proveedor.nombre_prov }}" data-type="email_empresa">{{ proveedor.email_empresa }}</td>
+                    <td class="editable" data-nombre_prov="{{ proveedor.nombre_prov }}" data-type="telefono_empresa">{{ proveedor.telefono_empresa }}</td>
+                    <td>
+                        <input type="checkbox" data-nombre_prov="{{ proveedor.nombre_prov }}" name="seleccionar" id="seleccionar">
+                    </td>
+                </tr> 
+                {% endfor %}    
+            </tbody>
+        </table>
+        <script type='text/javascript' src='{% static "js/proveedor.js" %}'></script>
+    </div>
+{% endblock %}

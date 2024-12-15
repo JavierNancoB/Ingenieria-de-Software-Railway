@@ -1,0 +1,209 @@
+{% load static %}    
+{% include "base.html" %}
+<!-- En este archivo HTML se crea la tabla de Inventario y Stock, la cual será heredada en la página de Inventario y Stock. En ella se encontrarán los productos que se encuentran en la base de datos.-->
+{% block content %}
+    <!-- Mensajes de error o éxito. -->
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} m-3">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <div id="tablas-css">
+        <link type="text/css" href='{% static "css/tablas.css" %}' rel="stylesheet"/>
+        <div id="titulo-modelo">
+            <h1>INVENTARIO Y STOCK</h1>
+        </div>
+        <!-- Aqui se crea la nueva tabla con el resumen -->
+        <div>
+            <table id="totals-table" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <!-- Encabezado de la tabla resumen. -->
+                        <th>INGRESOS TOTALES</th>
+                        <th>SALIDAS TOTALES</th>
+                        <th>MOVIMIENTO ENTRE BODEGAS</th>
+                        <th>STOCK TOTAL</th>
+                        <th>COSTO TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <!-- Ciclo para llenar la tabla con los datos de la base de datos. -->
+                        <td class="ingresos-totales" data-value="{{ ingresos_totales }}">{{ ingresos_totales }}</td>
+                        <td class="salidas-totales" data-value="{{ total_salidas }}">{{ total_salidas }}</td>
+                        <td class="movimiento-entre-bodegas" data-value="{{ movimiento_entre_bodegas }}">{{ movimiento_entre_bodegas }}</td>
+                        <td class="stock-total" data-value="{{ stock_total }}">{{ stock_total }}</td>
+                        <td class="costo-total" data-value="{{ costo_total }}">{{ costo_total }}</td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Formulario para subir el archivo Excel -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <form method="POST" enctype="multipart/form-data" action="{% url 'upload_excel_inventario' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Subir archivo Excel:</label>
+                        <input type="file" name="file" class="form-control" accept=".xlsx, .xls" required>
+                    </div>
+                    <div class="d-flex " style="gap: 5px;">
+                        <button type="submit" class="btn btn-primary">Subir archivo</button>
+                        <a href="{% static 'xlsx/inventario.xlsx' %}" class="btn btn-outline-success">Descargar Formato de Excel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Botón para eliminar. -->
+        <div class="col d-grid gap-2 d-md-flex">
+            <button id="eliminar-seleccion" type="button" class="btn btn-danger">Eliminar Selección</button>
+        </div>
+        <!-- Contenedor principal con opciones de edición y añadir producto. -->
+        <div class="a">
+            <div class="row align-items-end">
+                <div class="col">
+                    <div id="ediciones">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Editar</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addnewproducto">
+                        Añade un producto
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal -->
+        <div class="modal fade" id="addnewproducto" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Añadir Inventario y stock</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <!-- Formulario para añadir un producto. -->
+                        <div class="mb-3">
+                            <label for="SKU">SKU</label>
+                            <div class="d-flex align-items-center">
+                                <select class="form-control" id="SKU" style="flex-grow: 1;">
+                                    <!-- Las opciones se llenarán con JavaScript -->
+                                </select>
+                                <a href="/producto?openModal=true" id="link-svg">
+                                    <img src="{% static 'images/plus.svg' %}" id="boton-producto" alt="Agregar" style="width: 24px; height: 24px; margin-left: 10px;" >
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Nombre del proveedor</label>
+                            <div class="d-flex align-items-center">
+                                <select class="form-control" id="nombre_prov" style="flex-grow: 1;">
+                                    <!-- Las opciones se llenarán con JavaScript -->
+                                </select>
+                                <a href="/proveedor?openModal=true" id="link-svg">
+                                    <img src="{% static 'images/plus.svg' %}" id="boton-producto" alt="Agregar" style="width: 24px; height: 24px; margin-left: 10px;" >
+                                </a>
+                            </div>
+                        </div>    
+                        <div class="mb-3">
+                            <label>Bodega</label>
+                            <input type="text" id="bodega" class="form-control"/>
+                        </div>
+                        <div class="mb-3">
+                            <label>Fecha de ingreso</label>
+                            <input type="date" id="fecha-ingreso" class="form-control"/>
+                        </div>
+                        <div class="mb-3">
+                            <label>Cantidad</label>
+                            <input type="number" id="cantidad" class="form-control"/>
+                        </div>
+                        <div class="mb-3">
+                            <label>Salidas</label>
+                            <input type="number" id="salidas" class="form-control"/>
+                        </div>
+                        <div class="mb-3">
+                            <label>Movimiento de bodegas</label>
+                            <input type="number" id="mov-bodega" class="form-control"/>
+                        </div>
+                        <div class="mb-3">
+                            <label>Stock</label>
+                            <input type="text" id="stock" class="form-control" disabled/>
+                        </div>
+                        <div class="mb-3">
+                            <label>Precio unitario</label>
+                            <input type="text" id="precio-unitario" class="form-control"/>
+                        </div>
+                        <div class="mb-3">
+                            <label>Precio total</label>
+                            <input type="text" id="precio-total" class="form-control" disabled/>
+                        </div>
+                        
+                        
+                    </form>
+                </div>
+                <!-- Botones para guardar o cancelar. -->
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" class="btn btn-primary" id="submit">Guardar cambios</button>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!-- Inicio de la tabla. -->
+        <table id="table" summary="tabla Inventario stock" class="table table-bordered table-hover dt-responsive">
+            <thead>    
+            <tr class="listado"> 
+                <!-- Encabezados. -->
+                <th> ID </th>
+                <th> SKU </th>
+                <th> NOMBRE PROVEEDOR </th>
+                <th> BODEGA </th>  
+                <th> FECHA DE INGRESO</th> 
+                <th> CANTIDAD</th>
+                <th> SALIDAS </th>
+                <th> MOVIMIENTO DE BODEGAS </th>
+                <th> STOCK </th>
+                <th> PRECIO UNITARIO </th>
+                <th> PRECIO TOTAL </th>
+                <th> SEL </th>
+            </tr>
+            </thead>
+            <tbody>        
+                <!-- Ciclo para llenar la tabla con los datos de la base de datos. -->
+                {% for inventario_Y_stock in inventario_Y_stocks %}
+                <tr class="listado">
+                    <td>{{ inventario_Y_stock.id_inventario }}</td>
+                    <td>{{ inventario_Y_stock.SKU }}</td>
+                    <td>{{ inventario_Y_stock.nombre_prov }}</td>
+                    <td class="editable" data-id_inventario="{{ inventario_Y_stock.id_inventario }}" data-type="bodega">{{ inventario_Y_stock.bodega }}</td>
+                    <td class="editable" data-id_inventario="{{ inventario_Y_stock.id_inventario }}" data-type="fecha_de_ingreso">{{ inventario_Y_stock.fecha_de_ingreso }}</td>
+                    <td class="editable" data-id_inventario="{{ inventario_Y_stock.id_inventario }}" data-type="cantidad">{{ inventario_Y_stock.cantidad }}</td>
+                    <td class="editable" data-id_inventario="{{ inventario_Y_stock.id_inventario }}" data-type="salidas">{{ inventario_Y_stock.salidas }}</td>
+                    <td class="editable" data-id_inventario="{{ inventario_Y_stock.id_inventario }}" data-type="mov_bodega">{{ inventario_Y_stock.mov_bodegas }}</td>
+                    <td data-id_inventario="{{ inventario_Y_stock.id_inventario }}" data-type="stock">{{ inventario_Y_stock.stock }}</td>
+                    <td class="editable" data-id_inventario="{{ inventario_Y_stock.id_inventario }}" data-type="precio_unitario">{{ inventario_Y_stock.precio_unitario }}</td>
+                    <td data-id_inventario="{{ inventario_Y_stock.id_inventario }}" data-type="precio_total">{{ inventario_Y_stock.precio_total }}</td>
+                    <!-- stock y precio total no son editables
+                    <td>{{ inventario_Y_stock.stock }}</td>
+                    <td>{{ inventario_Y_stock.precio_total }}</td> -->
+                    <td>
+                        <input type="checkbox" data-id_inventario="{{ inventario_Y_stock.id_inventario }}" name="seleccionar" id="seleccionar">
+                    </td>
+                </tr> 
+                {% endfor %}  
+
+            </tbody>
+        </table>
+        <script type='text/javascript' src='{% static "js/Inventario_Y_Stock.js" %}'></script>
+        
+    </div>
+{% endblock %}

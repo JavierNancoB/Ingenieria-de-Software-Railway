@@ -1,0 +1,52 @@
+{% load static%}  
+{% include "base.html" %}
+{% block content %}
+<!-- En este archivo HTML se crea la página de inicio, la cual será heredada en la página de inicio. En ella se encontrarán los accesos directos a las diferentes secciones de la aplicación, un gráfico de ventas, una bandeja de entrada con alertas de fecha de vencimiento y un gráfico de inventario.-->
+
+<!DOCTYPE html> 
+<html>
+ <link type="text/css" href='{% static "css/homebutton.css" %}' rel="stylesheet"/>
+    <body>
+        <br>
+        <div class="Home">
+            <div>
+                <h4>Accesos Directos</h4>
+                <div class="contenedor-daccess">
+                    <ul class="contenedor-ul">
+                        <!-- Botones de acceso rápido a diferentes secciones -->
+                        <li><a id="b001" href="/proveedor" class="boton-daccess"><img class="Foto" src="{% static 'images/user.png' %}" alt="Proveedores" width="30" height="30"><span>Proveedores</span></a></li>
+                        <li><a id="b002" href="/producto" class="boton-daccess"><img class="Foto" src="{% static 'images/glass.png' %}" alt="Productos" width="30" height="30"><span>Productos</span></a></li>
+                        <li><a id="b003" href="/venta" class="boton-daccess"><img class="Foto" src="{% static 'images/cash.png' %}" alt="Ventas" width="30" height="30"><span>Ventas</span></a></li>
+                        <li><a id="b004" href="/Inventario_Y_Stock" class="boton-daccess"><img class="Foto" src="{% static 'images/box.png' %}" alt="Stock" width="30" height="30"><span>Stock</span></a></li>
+                        <li><a id="b005" href="/cliente" class="boton-daccess"><img class="Foto" src="{% static 'images/hand.png' %}" alt="Clientes" width="30" height="30"><span>Clientes</span></a></li>
+                        <li><a id="b006" href="/compra_proveedor" class="boton-daccess"><img class="Foto" src="{% static 'images/ticket.png' %}" alt="Compras" width="30" height="30"><span>Compras</span></a></li>
+                    </ul>
+                </div>                        
+            </div>
+            <div id="bandeja-de-entrada">
+                <h4>Bandeja de entrada</h4>
+            <table id="table" summary="tabla notificaciones" class="table table-bordered table-hover dt-responsive table-fixed">
+                <thead>    
+                <!-- Tabla de notificaciones -->
+                <tr class="listado">   
+                    <!-- Encabezados de la tabla -->
+                    <th>N° ORDEN DE COMPRA</th>
+                    <th>FECHA DE VENCIMIENTO</th>
+                </tr>
+                </thead>
+                <tbody>        
+                    <!-- Ciclo para mostrar las alertas de fecha de vencimiento -->
+                    {% for alerta in alertas_de_fecha_vencimiento %}
+                    <tr class="listado">
+                        <td>{{ alerta.OC }}</td>
+                        <td class="Fecha">{{ alerta.fecha_vencimiento }}</td>
+                    </tr> 
+                    {% endfor %}    
+                </tbody>
+            </table>
+            </div>
+        </div>
+        <script type='text/javascript' src='{% static "js/home.js" %}'></script>
+    </body>
+</html>
+{% endblock %}
