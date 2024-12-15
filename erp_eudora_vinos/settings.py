@@ -35,9 +35,9 @@ if ENVIRONMENT == 'development':
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['gestionerpeudoravinos.railway.internal']
+ALLOWED_HOSTS = ['gestionerpeudoravinos-production.up.railway.app']
 
-CSRF_TRUSTED_ORIGINS = ['https://gestionerpeudoravinos.railway.internal']
+CSRF_TRUSTED_ORIGINS = ['https://gestionerpeudoravinos-production.up.railway.app']
 
 # Application definition
 INSTALLED_APPS = [
