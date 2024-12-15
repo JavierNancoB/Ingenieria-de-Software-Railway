@@ -30,14 +30,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if ENVIRONMENT == 'development':
-    DEBUG = True
-else:
-    DEBUG = False
 
-ALLOWED_HOSTS = ['gestionerpeudoravinos-production.up.railway.app']
+DEBUG = False
 
-CSRF_TRUSTED_ORIGINS = ['https://gestionerpeudoravinos-production.up.railway.app']
+ALLOWED_HOSTS = ['*']
+
+CSRF_TRUSTED_ORIGINS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -48,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'website.apps.WebsiteConfig',
-    'django.contrib.sites',
+    #'django.contrib.sites',
     'admin_honeypot',
     'authuser',  # Incluimos la app authuser que sera la encargada de manejar la autenticacion de usuarios
 ]
@@ -100,7 +98,7 @@ DATABASES = {
     }
 }
 
-POSTGRES_LOCALLY = False
+POSTGRES_LOCALLY = True
 if ENVIRONMENT == 'production' or POSTGRES_LOCALLY:
     DATABASES['default'] = dj_database_url.parse(env('DATABASE_URL'))
 
